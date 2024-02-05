@@ -34,7 +34,6 @@ def update_history_add_expense(value: float, category=""):
 
         month_year = get_month_and_year()
         week_no = get_week_number()
-
         total_spent = value
 
 
@@ -52,7 +51,10 @@ def update_history_add_expense(value: float, category=""):
                 }
             }
 
-
+        global db_ref
+        global data_to_send
+        db_ref = None
+        data_to_send = {}
         if history_data != None:
             month_year_data =  db.child(id).child("history").child(month_year).get().val()
 
@@ -62,17 +64,19 @@ def update_history_add_expense(value: float, category=""):
                 if week_no_data != None:
                     total_spent = value + db.child(id).get().val()["history"][month_year][week_no]["totalSpent"]
                     data["history"][month_year][week_no]["totalSpent"] = total_spent
-                    data = set_categories(data, month_year, week_no, category, total_spent, value, get_from_db=True)
-                    db.child(id).update(data)
+                    data_to_send = set_categories(data, month_year, week_no, category, total_spent, value, get_from_db=True)["history"][month_year][week_no]
+                    db_ref = db.child(id).child("history").child(month_year).child(week_no)
                 else:
-                    data = set_categories(data, month_year, week_no, category, total_spent, value)
-
+                    data_to_send = set_categories(data, month_year, week_no, category, total_spent, value)["history"][month_year][week_no]
+                    db_ref = db.child(id).child("history").child(month_year).child(week_no)
             else:
-                data = set_categories(data, month_year, week_no, category, total_spent, value)
-                db.child(id).update(data)
+                data_to_send = set_categories(data, month_year, week_no, category, total_spent, value)["history"][month_year]
+                db_ref = db.child(id).child("history").child(month_year)
         else:
-            data = set_categories(data, month_year, week_no, category, total_spent, value)
-            db.child(id).update(data)
+            db_ref = db.child(id).child("history")
+            data_to_send = set_categories(data, month_year, week_no, category, total_spent, value)["history"]
+
+        db_ref.update(data_to_send)
         return True
 
     except Exception as e:
