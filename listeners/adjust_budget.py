@@ -1,7 +1,7 @@
 from bot_setup import bot, Session
 from models.Adjust_Budget_Main_Menu import Adjust_Budget_Main_Menu
 from subflows.error_messages import default_error_message, invalid_value_type_error
-from utils.formatter import text_formatter
+from utils.formatter import text_formatter, money_formatter
 from firebase.read_user import has_categories_registered, get_budget
 from firebase.update_user import update_total_budget
 from subflows.main_menu import main_menu
@@ -70,7 +70,7 @@ def handle_main_menu_choice(choice):
 def adjust_total_budget():
     try:
         previous_budget = get_budget(Session.chat_id)["budgetFinal"]
-        message_content = ("Seu limite anterior: R$" + str(previous_budget)
+        message_content = ("Seu limite anterior: R$" + money_formatter(previous_budget)
                            + "{lineBreak}{lineBreak}{bold}Digite o novo limite de gastos:{bold}")
         bot.send_message(Session.chat_id, text_formatter(message_content))
         AdjustBudgetSession.prev_step = "main_menu"
@@ -110,18 +110,18 @@ def budget_value_updated_message():
     try:
         AdjustBudgetSession.current_step = "done"
 
-        message_content = "Que legal! Seu limite foi atualizado.{lineBreak}{bold}Olha aqui um resumo dos seus limites:{bold}{lineBreak}"
+        message_content = "Que legal! Seu limite foi atualizado.{lineBreak}{lineBreak}{bold}Olha aqui um resumo dos seus limites:{bold}{lineBreak}"
 
         budget_db = get_budget(Session.chat_id)
         categories = budget_db["categories"]
 
-        budget_summary = "{lineBreak}{italic}LIMITE TOTAL: R${italic}" + str(budget_db["budgetFinal"])
-        budget_summary += "{lineBreak}{bold}{italic}LIMITE POR CATEGORIAS:{italic}{bold}"
+        budget_summary = "{lineBreak}{italic}LIMITE TOTAL: R${italic}" + money_formatter(budget_db["budgetFinal"])
+        budget_summary += "{lineBreak}{lineBreak}{bold}{italic}LIMITE POR CATEGORIAS:{italic}{bold}"
 
         for category in categories:
             formatted_category = category.replace("_", " ").lower().capitalize()
-            budget_summary = budget_summary + "{lineBreak}- {bold}" + formatted_category + ":{bold} R$" + str(
-                categories[category])
+            budget_summary = (budget_summary + "{lineBreak}- {bold}" + formatted_category + ":{bold} R$"
+                              + money_formatter(categories[category]))
 
         message_content += budget_summary
         message_content = text_formatter(message_content)
