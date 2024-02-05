@@ -59,13 +59,12 @@ def get_expenses():
     id = Session.chat_id
     month_year = get_month_and_year()
     week_no = get_week_number()
-
     try:
         history = db.child(id).get().val()["history"][month_year][week_no]
         return history
     except Exception as e:
         print(e.__str__())
-        return {}
+        return None
 
 
 def has_history():
