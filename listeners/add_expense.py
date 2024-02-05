@@ -6,7 +6,7 @@ from firebase.update_user import update_history_add_expense
 from datetime import datetime
 
 from subflows.main_menu import main_menu, go_back_to_main_menu
-from utils.formatter import text_formatter
+from utils.formatter import text_formatter, money_formatter
 
 
 class AddExpenseSession:
@@ -97,15 +97,15 @@ def added_expense_message():
         if planned_budget != 0:
             percent_expended = (expense_history["totalSpent"] * 100) / planned_budget
 
-        message_content += "{lineBreak}{lineBreak}Seu gasto total: R$" + str(expense_history["totalSpent"])
+        message_content += "{lineBreak}{lineBreak}Seu gasto total: R$" + money_formatter(expense_history["totalSpent"])
 
         message_content += "{lineBreak}{lineBreak}{bold}{italic}Gastos por categoria{italic}{bold}:"
 
         for cat in expense_history["categories"]:
-            message_content += "{lineBreak}- " + cat + ": R$" + str(expense_history["categories"][cat])
+            message_content += "{lineBreak}- " + cat + ": R$" + money_formatter(expense_history["categories"][cat])
 
-        message_content += "{lineBreak}{lineBreak}Seu budget semanal é: R$" + str(planned_budget)
-        message_content += "{lineBreak}{lineBreak}{bold}Você já gastou " + str(percent_expended) + "% do limite estabelecido.{bold}"
+        message_content += "{lineBreak}{lineBreak}Seu budget semanal é: R$" + money_formatter(planned_budget)
+        message_content += "{lineBreak}{lineBreak}{bold}Você já gastou " + money_formatter(percent_expended) + "% do limite estabelecido.{bold}"
 
         message_content = text_formatter(message_content)
 
