@@ -31,5 +31,6 @@ class Main_Menu:
         for btn in all_menu_btns:
             markup.add(btn)
         return markup
+
     def get_menu_message(self):
         return self._message
