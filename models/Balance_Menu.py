@@ -15,7 +15,11 @@ class BalanceMenu:
         user_has_history = has_history()
 
         if user_has_history:
-            self._total_spent += get_expenses()["totalSpent"]
+            expenses = get_expenses()
+            if expenses != None:
+                self._total_spent += get_expenses()["totalSpent"]
+            else:
+                self._total_spent = 0
 
         if self._budget_limit != 0 and self._total_spent != 0:
             self._percent_spent = (self._total_spent * 100)/self._budget_limit
